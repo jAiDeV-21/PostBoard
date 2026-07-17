@@ -3,7 +3,7 @@
    <div class="d-flex align-items-start gap-4">
       <img
          class="rounded-circle article-img flex-shrink-0"
-         src="/static/profile_pics/default.jpg"
+         src="{{ url_for('static', path='profile_pics/default.jpg') }}"
          alt="{{ post.author }}'s profile picture"
          width="64"
          height="64"
