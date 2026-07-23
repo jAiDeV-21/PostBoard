@@ -4,15 +4,17 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 SQLALCHEMY_DATABASE_URL = "sqlite:///./blog.db"
 
 engine = create_engine(
-   SQLALCHEMY_DATABASE_URL,
-   connect_arge={"check_same_thread": False},
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False},
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 class Base(DeclarativeBase):
-   pass
+    pass
+
 
 def get_db():
-   with SessionLocal() as db:
-      yield db
+    with SessionLocal() as db:
+        yield db
