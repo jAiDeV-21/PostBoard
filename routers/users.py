@@ -81,6 +81,7 @@ async def get_user_posts(user_id: int, db: db_dependency):
         select(models.Post)
         .options(selectinload(models.Post.author))
         .where(models.Post.user_id == user_id)
+        .order_by(models.Post.date_posted.desc())
     )
     posts = result.scalars().all()
     return posts
