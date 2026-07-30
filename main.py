@@ -20,7 +20,7 @@ from routers import posts, users
 
 # async sqlalchemy does not support lazy loading like sqlalchemy instead it supports eager-loading hence we imported 'selectinload'
 @asynccontextmanager
-async def lifspan(_app: FastAPI):
+async def lifespan(_app: FastAPI):
     # Startup
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -29,7 +29,7 @@ async def lifspan(_app: FastAPI):
     await engine.dispose()
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/media", StaticFiles(directory="media"), name="media")
@@ -102,6 +102,24 @@ async def user_posts_page(request: Request, user_id: int, db: db_dependency):
         request,
         "user_posts.html",
         {"posts": posts, "user": user, "title": f"{user.username} 's posts"},
+    )
+
+
+@app.get("/login", include_in_schema=False)
+async def login_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "login.html",
+        {"title": "Login"},
+    )
+
+
+@app.get("/register", include_in_schema=False)
+async def register_page(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "register.html",
+        {"title": "Register"},
     )
 
 
