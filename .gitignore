@@ -1,6 +1,9 @@
 # dot-env
 .env
 
+# sqlite db file
+*.db
+
 # Python-generated files
 __pycache__/
 *.py[oc]
