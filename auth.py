@@ -1,14 +1,12 @@
 from datetime import UTC, datetime, timedelta
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from pwdlib import PasswordHash
+from sqlalchemy import select
 
 import models
-from dependecies import db_dependency
 from config import settings
 from dependencies import db_dependency, token_dependency
 
@@ -52,26 +50,25 @@ def verify_access_token(token: str) -> str | None:
             token,
             settings.secret_key.get_secret_value(),
             algorithms=[settings.algorithm],
-            options={
-               "require": ["exp", "sub"]
-            },
+            options={"require": ["exp", "sub"]},
         )
     except jwt.InvalidTokenError:
         return None
     else:
         return payload.get("sub")
 
+
 async def get_current_user(
-        token: token_dependency,
-        db: db_dependency,
+    token: token_dependency,
+    db: db_dependency,
 ) -> models.User:
     user_id = verify_access_token(token)
 
     if user_id is None:
         raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired token.",
-                header={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token.",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     try:
         user_id_int = int(user_id)
@@ -79,19 +76,19 @@ async def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token.",
-            header={"WWW-Authenticate": "Bearer"},
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
     result = await db.execute(
-            select (models.User).where(models.User.id == user_id_int),
+        select(models.User).where(models.User.id == user_id_int),
     )
     user = result.scalars().first()
 
     if not user:
         raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found",
-                header={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
     return user

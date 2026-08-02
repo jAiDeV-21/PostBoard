@@ -10,11 +10,10 @@ import models
 from auth import (
     create_access_token,
     hash_password,
-    verify_access_token,
     verify_password,
 )
 from config import settings
-from dependencies import db_dependency, token_dependency, current_user_dependency
+from dependencies import current_user_dependency, db_dependency
 from schemas import PostResponse, Token, UserCreate, UserPrivate, UserPublic, UserUpdate
 
 router = APIRouter()
@@ -136,12 +135,17 @@ async def get_user_posts(user_id: int, db: db_dependency):
 
 
 @router.patch("/{user_id}", response_model=UserPublic)
-async def update_user(user_id: int, user_update: UserUpdate, current_user: current_user_dependency, db: db_dependency):
+async def update_user(
+    user_id: int,
+    user_update: UserUpdate,
+    current_user: current_user_dependency,
+    db: db_dependency,
+):
     if user_id != current_user.id:
         raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN,
-                detail="Unauthorized to update the user profile."
-            )
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Unauthorized to update the user profile.",
+        )
 
     result = await db.execute(
         select(models.User)
@@ -193,12 +197,14 @@ async def update_user(user_id: int, user_update: UserUpdate, current_user: curre
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, current_user: current_user_dependency db: db_dependency):
+async def delete_user(
+    user_id: int, current_user: current_user_dependency, db: db_dependency
+):
     if user_id != current_user.id:
         raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN,
-                detail="Not authorized to delete this user.",
-                )
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to delete this user.",
+        )
     result = await db.execute(select(models.User).where(models.User.id == user_id))
     user = result.scalars().first()
     if not user:
