@@ -40,7 +40,7 @@ Built with FastAPI, SQLAlchemy, and vanilla JavaScript, PostBoard lets users cre
 
 ```bash
 # Clone the repo
-git clone https://github.com/<your-username>/postboard.git
+git clone https://github.com/jaidev-21/postboard.git
 cd postboard
 
 # Create a virtual environment
