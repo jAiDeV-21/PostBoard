@@ -4,6 +4,9 @@
 # sqlite db file
 *.db
 
+# media folder storing user profile pictures
+media/
+
 # Python-generated files
 __pycache__/
 *.py[oc]
