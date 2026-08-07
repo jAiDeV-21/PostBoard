@@ -8,6 +8,7 @@
 media/
 
 # Python-generated files
+generate_tree.py
 __pycache__/
 *.py[oc]
 build/
